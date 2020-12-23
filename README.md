@@ -22,7 +22,7 @@ pip install --user -r requirements.txt
 
 ## Usage
 
-Before you run the pipeline, download the desired restoration and translation models into the `models` folder. Make sure you edit the configuration file `paths.conf`, so that the variables point to the correct paths for your system.
+Before you run the pipeline, download the desired pre-trained models, and extract the archives into the `models` folder. Make sure you edit the configuration file `paths.conf`, so that the variables point to the correct paths for your system.
 
 The script `translate.py` runs the entire pipeline from source language subtitles to target language subtitles. Run `./translate.py --help` to read about supported options.
 
