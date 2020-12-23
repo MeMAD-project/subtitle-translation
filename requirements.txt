@@ -1,0 +1,4 @@
+argparse
+regex
+traceback
+sentencepiece >= 0.1.85
