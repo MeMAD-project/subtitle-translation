@@ -62,6 +62,8 @@ The models provided for download have been trained on a snapshot of the entire [
 
 ### Translation model benchmarks
 
+For reference, we provide some BLEU scores for the translation models in particular.
+
 #### OpenSubtitles held-out test set
 
 | src → tgt  | `→ de`  | `→ en`  | `→ fi`  | `→ fr`  | `→ nl`  | `→ sv`  |
@@ -75,7 +77,7 @@ The models provided for download have been trained on a snapshot of the entire [
 
 #### WMT news translation test sets
 
-Test sets from WMT news translation tasks until 2019 were part of the training data for the pretrained translation models. Benchmarking on the WMT 2020 news translation task test sets were provided below for reference.
+Test sets from WMT news translation tasks until 2019 were part of the training data for the pretrained translation models. We provide additional benchmarking results on the WMT 2020 news translation task test sets below.
 
 ##### WMT 2020
 
