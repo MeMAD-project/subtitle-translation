@@ -12,7 +12,7 @@ Pre-trained restoration, translation, and segmentation models for the pipeline a
 * Data processing scripts from [`moses`](https://github.com/moses-smt/mosesdecoder)
 * Data processing scripts from [`OpusTools-perl`](https://github.com/Helsinki-NLP/OpusTools-perl)
   - Required Perl libraries listed in the repository
-* Data processing scripts from [`subalign`](https://github.com/Helsinki-NLP/subalign)
+* Data processing scripts from [`subalign`](https://github.com/MeMAD-project/subalign)
 
 To check for and install the required Python libraries, navigate to the directory where you cloned the repository, and run the following command:
 
