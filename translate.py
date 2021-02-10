@@ -109,7 +109,7 @@ try:
   log('PREPROCESSING', '...done!')
 
   if args.gpu_devices > 0:
-    comp_node = '--devices %s' % ' '.join(list(range(args.gpu_devices)))
+    comp_node = '--devices %s' % ' '.join(['%d' % gpu_device for gpu_device in range(args.gpu_devices)])
   else:
     comp_node = '--cpu-threads %d' % args.cpu_threads
   
