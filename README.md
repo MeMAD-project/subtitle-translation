@@ -2,7 +2,7 @@
 
 This repository contains scripts that implement the subtitle translation pipeline developed as part of the [MeMAD project](https://memad.eu). The pipeline makes use of [subalign](https://github.com/Helsinki-NLP/subalign) and [OpusTools-perl](https://github.com/Helsinki-NLP/OpusTools-perl) for converting between subtitle and plain text formats, the [Moses](http://www.statmt.org/moses/) toolkit for pre- and post-processing, [SentencePiece](https://github.com/google/sentencepiece) for subword segmentation, and [Marian NMT](https://github.com/marian-nmt/marian) transformers trained as (1) restoration models, which substitute for normalizing punctuation and truecasing, and (2) translation models.
 
-Pre-trained restoration, translation, and segmentation models for the pipeline will be shortly available for download from a **Zenodo repository**. These models support Dutch, English, Finnish, French, German and Swedish, and allow subtitle translation between any two of these languages.
+Pre-trained restoration, translation, and segmentation models for the pipeline are available for download via [Zenodo](https://zenodo.org/record/4389209). These models support Dutch, English, Finnish, French, German and Swedish, and allow subtitle translation between any two of these languages.
 
 ## Dependencies
 
@@ -12,7 +12,7 @@ Pre-trained restoration, translation, and segmentation models for the pipeline w
 * Data processing scripts from [`moses`](https://github.com/moses-smt/mosesdecoder)
 * Data processing scripts from [`OpusTools-perl`](https://github.com/Helsinki-NLP/OpusTools-perl)
   - Required Perl libraries listed in the repository
-* Data processing scripts from [`subalign`](https://github.com/Helsinki-NLP/subalign)
+* Data processing scripts from [`subalign`](https://github.com/MeMAD-project/subalign)
 
 To check for and install the required Python libraries, navigate to the directory where you cloned the repository, and run the following command:
 
@@ -22,7 +22,9 @@ pip install --user -r requirements.txt
 
 ## Usage
 
-Before you run the pipeline, download the desired pre-trained models, and extract the archives into the `models` folder. Make sure you edit the configuration file `paths.conf`, so that the variables point to the correct paths for your system.
+The pipeline requires segmentation models (`sentencepiece-models.tar.gz`), restoration models for the source language (`restore-xx.tar.gz`), and translation models from the source language to the target language (`xx-yy.tar.gz`). Download the desired pre-trained models from the [Zenodo](https://zenodo.org/record/4389209) repository, and extract the archives into the `models` folder.
+
+Before you run the pipeline, make sure you edit the configuration file `paths.conf`, so that the variables point to the correct paths for your system.
 
 The script `translate.py` runs the entire pipeline from source language subtitles to target language subtitles. Run `./translate.py --help` to read about supported options.
 
