@@ -21,6 +21,7 @@ parser.add_argument('-l', '--log', type=str, default=None, help='path to the log
 parser.add_argument('-p', '--strict-sentence-parsing', action='store_true', default=False, help='use a strict sentence parser alternative that relies on punctuation (default: False)')
 parser.add_argument('-g', '--gpu-devices', type=int, default=0, help='use this many GPU devices for NMT decoding (default: 0, CPU-based computation)')
 parser.add_argument('-c', '--cpu-threads', type=int, default=1, help='use this many CPU threads for NMT decoding (default: 1)')
+parser.add_argument('--plain-text-mode', action='store_true', default=False, help='translate from plain text (one sentence per line) instead of SRT (default: False)')
 
 args = parser.parse_args()
 
@@ -62,30 +63,34 @@ try:
   
   log('PREPROCESSING', 'Preprocessing input subtitles...')
   
-  log('PREPROCESSING', '...parsing sentences...')
-  
-  if args.strict_sentence_parsing:
-    exe_path = path.join(scripts_dir, 'srt2sent.py')
-    txt_path = path.join(temp_dir, inp_name + '.txt')
-    tmp_paths.append(txt_path)
+  if not args.plain_text_mode:
+    log('PREPROCESSING', '...parsing sentences...')
     
-    system('%s -i %s -o %s' % (exe_path, inp_path, txt_path))
-    assert path.isfile(txt_path)
+    if args.strict_sentence_parsing:
+      exe_path = path.join(scripts_dir, 'srt2sent.py')
+      txt_path = path.join(temp_dir, inp_name + '.txt')
+      tmp_paths.append(txt_path)
+      
+      system('%s -i %s -o %s' % (exe_path, inp_path, txt_path))
+      assert path.isfile(txt_path)
+    
+    else:
+      exe_path = path.join(subalign_dir, 'srt2xml')
+      xml_path = path.join(temp_dir, inp_name + '.xml')
+      
+      system('%s -e utf8 -r %s < %s' % (exe_path, xml_path, inp_path))
+      assert path.isfile(xml_path)
+      tmp_paths.append(xml_path)
+      
+      exe_path = path.join(opustoolsperl_dir, 'opus2text')
+      txt_path = path.join(temp_dir, inp_name + '.txt')
+      
+      system('%s < %s > %s' % (exe_path, xml_path, txt_path))
+      assert path.isfile(txt_path)
+      tmp_paths.append(txt_path)
   
   else:
-    exe_path = path.join(subalign_dir, 'srt2xml')
-    xml_path = path.join(temp_dir, inp_name + '.xml')
-    
-    system('%s -e utf8 -r %s < %s' % (exe_path, xml_path, inp_path))
-    assert path.isfile(xml_path)
-    tmp_paths.append(xml_path)
-    
-    exe_path = path.join(opustoolsperl_dir, 'opus2text')
-    txt_path = path.join(temp_dir, inp_name + '.txt')
-    
-    system('%s < %s > %s' % (exe_path, xml_path, txt_path))
-    assert path.isfile(txt_path)
-    tmp_paths.append(txt_path)
+    txt_path = inp_path
  
   log('PREPROCESSING', '...preprocessing sentences...')
   
@@ -167,18 +172,28 @@ try:
   log('POSTPROCESSING', '...postprocessing translations...')
   
   exe_path = path.join(scripts_dir, 'postprocess.sh')
-  tra_path = path.join(temp_dir, inp_name + '.translated')
+  
+  if args.plain_text_mode:
+    tra_path = out_path
+  
+  else:
+    tra_path = path.join(temp_dir, inp_name + '.translated')
   
   system('%s %s %s %s %s %s' % (exe_path, moses_dir, scripts_dir, tgt_lang, trb_path, tra_path))
   assert path.isfile(tra_path)
-  tmp_paths.append(tra_path)
   
-  log('POSTPROCESSING', '...fitting translations into subtitle segments...')
+  if not args.plain_text_mode:
+    tmp_paths.append(tra_path)
+    
+    log('POSTPROCESSING', '...fitting translations into subtitle segments...')
+    
+    exe_path = path.join(subalign_dir, 'mt2srt')
+    
+    system('%s -n %s < %s > %s' % (exe_path, inp_path, tra_path, out_path))
+    assert path.isfile(out_path)
   
-  exe_path = path.join(subalign_dir, 'mt2srt')
-  
-  system('%s -n %s < %s > %s' % (exe_path, inp_path, tra_path, out_path))
-  assert path.isfile(out_path)
+  else:
+    out_path = tra_path
   
   log('POSTPROCESSING', '...done!')
 
