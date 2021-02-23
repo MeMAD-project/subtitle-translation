@@ -2,7 +2,7 @@
 
 This repository contains scripts that implement the subtitle translation pipeline developed as part of the [MeMAD project](https://memad.eu). The pipeline makes use of [subalign](https://github.com/Helsinki-NLP/subalign) and [OpusTools-perl](https://github.com/Helsinki-NLP/OpusTools-perl) for converting between subtitle and plain text formats, the [Moses](http://www.statmt.org/moses/) toolkit for pre- and post-processing, [SentencePiece](https://github.com/google/sentencepiece) for subword segmentation, and [Marian NMT](https://github.com/marian-nmt/marian) transformers trained as (1) restoration models, which substitute for normalizing punctuation and truecasing, and (2) translation models.
 
-Pre-trained restoration, translation, and segmentation models for the pipeline are available for download via [Zenodo](https://zenodo.org/record/4389209). These models support Dutch, English, Finnish, French, German and Swedish, and allow subtitle translation between any two of these languages.
+Pre-trained restoration, translation, and segmentation models for the pipeline are available for download via Zenodo from [https://zenodo.org/record/4389209](https://zenodo.org/record/4389209) and [https://zenodo.org/record/4556121](https://zenodo.org/record/4556121). These models support Dutch, English, Finnish, French, German and Swedish, and allow subtitle translation between any two of these languages.
 
 ## Dependencies
 
@@ -88,6 +88,22 @@ Test sets from WMT news translation tasks until 2019 were part of the training d
 | **`de →`** |    —    |  32.97  |  29.28  | 
 | **`en →`** |  28.41  |    —    |    —    | 
 | **`fr →`** |  24.31  |    —    |    —    | 
+
+
+### Tatoeba-MT challenge models
+
+Additional models have been trained on the [Tatoeba-MT challenge datasets](https://github.com/Helsinki-NLP/Tatoeba-Challenge/). Those models cover the same six language pairs and have been benchmarked with MeMAD-internal test sets including translations between Finnish (FIN) and Swedish (SWE) subtitles from selected YLE TV programs with variants for the hearing impaired (indicated by the label FIH and SWH, espectively). We have also fine-tuned each model with disjoint training data from general movie subtitles (OpenSubtitles) and MeMAD-internal YLE data. The results are listed below:
+
+
+| tune / test         | FIN-SWE   | FIH-SWE   | FIN-SWH   | SWE-FIN   | SWH-FIN   | SWE-FIH |
+|:-------------------:|:---------:|:---------:|:---------:|:---------:|:---------:|:-------:|
+| baseline            | 22.3      | 17.0      | 18.2      | 20.8      | 15.9      | 12.2 |
+| OpenSubtitles (1M)  | 22.0      | 16.8      | 17.9      | 20.9      | 15.7      | 12.5 |
+| YLE-all       (2M)  | 24.7      | 19.6      | 19.5      | 22.7      | 17.4      | 13.6 |
+| YLE-FIN-SWE (1.1M)  | 24.9      | 18.9      | 19.5      | 23.1      | 17.3      | 13.9 |
+| YLE-FIH-SWE (47k)   | 23.6      | 19.7      | 18.4      | 21.5      | 16.0      | 14.8 |
+| YLE-FIN-SWH (850k)  | 23.8      | 18.5      | 19.5      | 23.0      | 17.7      | 13.9 |
+
 
 ## Publications
 
