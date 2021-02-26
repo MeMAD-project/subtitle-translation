@@ -2,7 +2,7 @@
 
 This repository contains scripts that implement the subtitle translation pipeline developed as part of the [MeMAD project](https://memad.eu). The pipeline makes use of [subalign](https://github.com/Helsinki-NLP/subalign) and [OpusTools-perl](https://github.com/Helsinki-NLP/OpusTools-perl) for converting between subtitle and plain text formats, the [Moses](http://www.statmt.org/moses/) toolkit for pre- and post-processing, [SentencePiece](https://github.com/google/sentencepiece) for subword segmentation, and [Marian NMT](https://github.com/marian-nmt/marian) transformers trained as (1) restoration models, which substitute for normalizing punctuation and truecasing, and (2) translation models.
 
-Pre-trained restoration, translation, and segmentation models for the pipeline are available for download via Zenodo from [https://zenodo.org/record/4389209](https://zenodo.org/record/4389209) and [https://zenodo.org/record/4556121](https://zenodo.org/record/4556121). These models support Dutch, English, Finnish, French, German and Swedish, and allow subtitle translation between any two of these languages.
+Pre-trained restoration, translation, and segmentation models for the pipeline are available for download from the [pipeline models](https://zenodo.org/record/4389209) repository on Zenodo. The translation models distributed from there are the default bilingual translation models. Multilingual translation models, other bilingual models fine-tuned on in-domain data, and further models that support guided alignment based on subword segments can all be found in the [supplementary models](https://zenodo.org/record/4556121) repository. These models collectively support Dutch, English, Finnish, French, German and Swedish, and allow subtitle translation between any two of these languages.
 
 ## Dependencies
 
@@ -55,6 +55,19 @@ The script `translate.py` runs the entire pipeline from source language subtitle
                --log process.log \
                --strict-sentence-parsing
 ```
+
+##### Translating plain text data
+
+If you need to circumvent the subtitle segmentation steps, and use the rest of the pipeline (restoration, translation, and other auxiliary processing) on plain text data, this is possible through the use of the `--plain-text-mode` option. Using this option requires an input file containing one sentence per line, rather than SRT-formatted subtitles. The output will be produced in the same format as the input.
+
+```
+./translate.py --src-lang de \
+               --tgt-lang en \
+               ...
+               --plain-text-mode
+```
+
+When using the pipeline exclusively in this mode, the `OpusTools-perl` and `subalign` software dependencies are no longer required.
 
 ## Models
 
