@@ -55,6 +55,8 @@ try:
   out_path = args.output.strip()
   
   inp_name = path.basename(inp_path)
+  out_name = path.basename(out_path)
+  tmp_name = '%s.%s' % (inp_name, out_name)
   
   src_lang = args.src_lang.strip()
   tgt_lang = args.tgt_lang.strip()
@@ -68,43 +70,43 @@ try:
     
     if args.strict_sentence_parsing:
       exe_path = path.join(scripts_dir, 'srt2sent.py')
-      txt_path = path.join(temp_dir, inp_name + '.txt')
-      tmp_paths.append(txt_path)
+      snt_path = path.join(temp_dir, tmp_name + '.sentences')
+      tmp_paths.append(snt_path)
       
-      system('%s -i %s -o %s' % (exe_path, inp_path, txt_path))
-      assert path.isfile(txt_path)
+      system('%s -i %s -o %s' % (exe_path, inp_path, snt_path))
+      assert path.isfile(snt_path)
     
     else:
       exe_path = path.join(subalign_dir, 'srt2xml')
-      xml_path = path.join(temp_dir, inp_name + '.xml')
+      xml_path = path.join(temp_dir, tmp_name + '.xml')
       
       system('%s -e utf8 -r %s < %s' % (exe_path, xml_path, inp_path))
       assert path.isfile(xml_path)
       tmp_paths.append(xml_path)
       
       exe_path = path.join(opustoolsperl_dir, 'opus2text')
-      txt_path = path.join(temp_dir, inp_name + '.txt')
+      snt_path = path.join(temp_dir, tmp_name + '.sentences')
       
-      system('%s < %s > %s' % (exe_path, xml_path, txt_path))
-      assert path.isfile(txt_path)
-      tmp_paths.append(txt_path)
+      system('%s < %s > %s' % (exe_path, xml_path, snt_path))
+      assert path.isfile(snt_path)
+      tmp_paths.append(snt_path)
   
   else:
-    txt_path = inp_path
+    snt_path = inp_path
  
   log('PREPROCESSING', '...preprocessing sentences...')
   
   exe_path = path.join(scripts_dir, 'preprocess.sh')
-  str_path = path.join(temp_dir, inp_name + '.strip')
+  str_path = path.join(temp_dir, tmp_name + '.strip')
   
-  system('%s %s %s %s %s' % (exe_path, moses_dir, src_lang, txt_path, str_path))
+  system('%s %s %s %s %s' % (exe_path, moses_dir, src_lang, snt_path, str_path))
   assert path.isfile(str_path)
   tmp_paths.append(str_path)
   
   log('PREPROCESSING', '...applying subword segmentation for restoration...')
 
   exe_path = path.join(scripts_dir, 'sentencepiece-apply.py')
-  uni_path = path.join(temp_dir, inp_name + '.strip.uni24k')
+  uni_path = path.join(temp_dir, tmp_name + '.strip.uni24k')
   mdl_path = path.join(models_dir, 'sentencepiece.%s.uni24k.model' % src_lang)
 
   system('%s --input %s --output %s --model %s' % (exe_path, str_path, uni_path, mdl_path))
@@ -121,11 +123,11 @@ try:
   log('RESTORATION', 'Applying punctuation and letter case restoration...')
   
   exe_path = path.join(scripts_dir, 'marian-decode.sh')
-  reu_path = path.join(temp_dir, inp_name + '.restored.uni24k')
+  reu_path = path.join(temp_dir, tmp_name + '.restored.uni24k')
   mdl_path = '"%s"' % ' '.join([path.join(models_dir, 'restore-%s.s%d.npz' % (src_lang, i)) for i in range(5)])
   voc_path = path.join(models_dir, 'restore-%s.vocab.yml' % src_lang)
   
-  system('%s %s %s %s %s %s 0.0 %s' % (exe_path, marian_dir, mdl_path, voc_path, uni_path, reu_path, comp_node))
+  system('%s %s %s %s %s %s 500 0.0 %s' % (exe_path, marian_dir, mdl_path, voc_path, uni_path, reu_path, comp_node))
   assert path.isfile(reu_path)
   tmp_paths.append(reu_path)
   
@@ -136,7 +138,7 @@ try:
   log('PREPROCESING', '...desegmenting output...')
   
   exe_path = path.join(scripts_dir, 'sentencepiece-deseg.sh')
-  res_path = path.join(temp_dir, inp_name + '.restored')
+  res_path = path.join(temp_dir, tmp_name + '.restored')
   
   system('%s < %s > %s' % (exe_path, reu_path, res_path))
   assert path.isfile(res_path)
@@ -145,7 +147,7 @@ try:
   log('PREPROCESSING', '...applying subword segmentation for translation...')
   
   exe_path = path.join(scripts_dir, 'sentencepiece-apply.py')
-  reb_path = path.join(temp_dir, inp_name + '.restored.bpe32k')
+  reb_path = path.join(temp_dir, tmp_name + '.restored.bpe32k')
   mdl_path = path.join(models_dir, 'sentencepiece.%s+%s.bpe32k.model' % tuple(sorted([src_lang, tgt_lang])))
 
   system('%s --input %s --output %s --model %s' % (exe_path, res_path, reb_path, mdl_path))
@@ -157,11 +159,11 @@ try:
   log('TRANSLATION', 'Translating the processed sentences...')
   
   exe_path = path.join(scripts_dir, 'marian-decode.sh')
-  trb_path = path.join(temp_dir, inp_name + '.translated.bpe32k')
+  trb_path = path.join(temp_dir, tmp_name + '.translated.bpe32k')
   mdl_path = '"%s"' % ' '.join([path.join(models_dir, '%s-%s.s%d.npz' % (src_lang, tgt_lang, i)) for i in range(5)])
   voc_path = path.join(models_dir, '%s-%s.vocab.yml' % (src_lang, tgt_lang))
   
-  system('%s %s %s %s %s %s 1.0 %s' % (exe_path, marian_dir, mdl_path, voc_path, reb_path, trb_path, comp_node))
+  system('%s %s %s %s %s %s 500 1.0 %s' % (exe_path, marian_dir, mdl_path, voc_path, reb_path, trb_path, comp_node))
   assert path.isfile(trb_path)
   tmp_paths.append(trb_path)
   
@@ -177,7 +179,7 @@ try:
     tra_path = out_path
   
   else:
-    tra_path = path.join(temp_dir, inp_name + '.translated')
+    tra_path = path.join(temp_dir, tmp_name + '.translated')
   
   system('%s %s %s %s %s %s' % (exe_path, moses_dir, scripts_dir, tgt_lang, trb_path, tra_path))
   assert path.isfile(tra_path)
@@ -191,9 +193,6 @@ try:
     
     system('%s -n %s < %s > %s' % (exe_path, inp_path, tra_path, out_path))
     assert path.isfile(out_path)
-  
-  else:
-    out_path = tra_path
   
   log('POSTPROCESSING', '...done!')
 
