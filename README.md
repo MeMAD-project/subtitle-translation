@@ -20,6 +20,11 @@ To check for and install the required Python libraries, navigate to the director
 pip install --user -r requirements.txt
 ```
 
+## Models
+
+* [MeMAD MT models](https://zenodo.org/record/4389209)
+* [MeMAD Tatoeba and subtitle tuned models](https://zenodo.org/record/4556121)
+
 ## Usage
 
 The pipeline requires segmentation models (`sentencepiece-models.tar.gz`), restoration models for the source language (`restore-xx.tar.gz`), and translation models from the source language to the target language (`xx-yy.tar.gz`). Download the desired pre-trained models from the [Zenodo](https://zenodo.org/record/4389209) repository, and extract the archives into the `models` folder.
@@ -105,7 +110,7 @@ Test sets from WMT news translation tasks until 2019 were part of the training d
 
 ### Tatoeba-MT challenge models
 
-Additional models have been trained on the [Tatoeba-MT challenge datasets](https://github.com/Helsinki-NLP/Tatoeba-Challenge/). Those models cover the same six language pairs and have been benchmarked with MeMAD-internal test sets including translations between Finnish (FIN) and Swedish (SWE) subtitles from selected YLE TV programs with variants for the hearing impaired (indicated by the label FIH and SWH, espectively). We have also fine-tuned each model with disjoint training data from general movie subtitles (OpenSubtitles) and MeMAD-internal YLE data. The results are listed below:
+[Additional models](https://zenodo.org/record/4556121) have been trained on the [Tatoeba-MT challenge datasets](https://github.com/Helsinki-NLP/Tatoeba-Challenge/). Those models cover the same six language pairs and have been benchmarked with MeMAD-internal test sets including translations between Finnish (FIN) and Swedish (SWE) subtitles from selected YLE TV programs with variants for the hearing impaired (indicated by the label FIH and SWH, espectively). We have also fine-tuned each model with disjoint training data from general movie subtitles (OpenSubtitles) and MeMAD-internal YLE data. The results are listed below:
 
 
 | tune / test         | FIN-SWE   | FIH-SWE   | FIN-SWH   | SWE-FIN   | SWH-FIN   | SWE-FIH |
